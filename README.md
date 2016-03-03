@@ -1,4 +1,4 @@
-# dali_slave
+# DALI Slave
 Implementation of DALI slave using C++ 11.
 
 Requirements:
