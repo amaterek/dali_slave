@@ -45,11 +45,6 @@ enum class Status {
 
 class IMemory {
 public:
-  class IMemoryClient {
-  public:
-    virtual void onBankReset(uint8_t bank) = 0;
-  };
-
   virtual size_t dataSize() = 0;
   virtual size_t dataWrite(uintptr_t addr, const uint8_t* data, size_t size) = 0;
   virtual const uint8_t* data(uintptr_t addr, size_t size) = 0;

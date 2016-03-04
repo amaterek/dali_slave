@@ -31,10 +31,9 @@ Memory::Memory(IMemory* memory) :
 
   for (uint8_t i = 0; i < DALI_BANKS; ++i) {
     mBankData[i] = mMemory->data(getBankAddr(i), getBankSize(i));
-    if ((uintptr_t) mBankData[i] == INVALID_BANK_ADDR) {
-      mBankData[i] = nullptr;
+    if (mBankData[i] != nullptr) {
+      resetBankIfNeeded(i);
     }
-    resetBankIfNeeded(i);
   }
 
   if (mData != nullptr) {
