@@ -90,11 +90,6 @@ uint64_t Timer::getTimeMs() {
 }
 
 // static
-uint16_t Timer::freq() {
-  return TICKS_PER_SECOND;
-}
-
-// static
 void Timer::runSlice() {
   for (uint8_t i = 0; i < MAX_TASKS; ++i) {
     TaskInfo* taskInfo = &gTasks[i];

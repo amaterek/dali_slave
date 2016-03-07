@@ -22,7 +22,7 @@
 
 extern const XMC_UART_CH_CONFIG_t kDaliTxUARTConfig;
 
-// CCU4 configuration - used for DALI TX
+// CCU4 configuration - used for DALI RX
 # define CCU40_SLICE CCU40_CC42
 # define CCU40_SLICE_NUMBER 2
 # define CCU40_SLICE_INPUT XMC_CCU4_SLICE_INPUT_C

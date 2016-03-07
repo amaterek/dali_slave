@@ -165,8 +165,6 @@ enum class Command {
   QUERY_RANDOM_ADDR_L = 196,
   READ_MEMORY_LOCATION = 197,
 
-  QUERY_EXTENDED_VERSION_NUMBER = 255,
-
   // Special commands
   _SPECIAL_COMMAND = 1024, // not for use
 

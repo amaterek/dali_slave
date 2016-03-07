@@ -28,7 +28,6 @@ public:
   uint32_t randomize() override;
 
   static uint64_t getTimeMs();
-  static uint16_t freq();
   static void runSlice();
 
 private:
