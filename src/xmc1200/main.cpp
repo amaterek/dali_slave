@@ -25,6 +25,18 @@
 #include <xmc_gpio.h>
 #include <xmc_scu.h>
 
+#ifdef DALI_TEST
+
+#include <test/tests_dt8.hpp>
+
+void daliTests() {
+  dali::unitTests();
+  dali::apiTests(dali::Slave::create);
+  dali::unitTestsDT8();
+  dali::apiTestsDT8(dali::SlaveDT8::create);
+}
+#endif // DALI_TEST
+
 dali::Slave* gSlave;
 
 void waitForInterrupt() {
@@ -68,6 +80,9 @@ volatile bool gEmergencyMemorySynchronise;
 int main(void) {
   xmc::Clock::init(XMC_CPU_FREQ);
 
+#ifdef DALI_TEST
+  daliTests();
+#endif
 
   initPowerDetector();
 

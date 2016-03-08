@@ -142,6 +142,7 @@
 								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.preprocessor.def.91794738" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="CPU_CLOCK=32000000"/>
 									<listOptionValue builtIn="false" value="XMC1200_T038x0200"/>
+									<listOptionValue builtIn="false" value="DALI_TEST"/>
 								</option>
 								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.warnings.toerrors.1701168972" name="Warnings as errors (-Werror)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.warnings.toerrors" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.unsignedbitfields.1660069779" name="Bitfields are unsigned (-funsigned-bitfields)" superClass="org.eclipse.cdt.cross.arm.gnu.c.compiler.option.misc.unsignedbitfields" useByScannerDiscovery="false" value="true" valueType="boolean"/>
@@ -164,6 +165,7 @@
 								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.preprocessor.def.1564220828" name="Defined symbols (-D)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="CPU_CLOCK=32000000"/>
 									<listOptionValue builtIn="false" value="XMC1200_T038x0200"/>
+									<listOptionValue builtIn="false" value="DALI_TEST"/>
 								</option>
 								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.preprocessor.nostdincpp.1743927048" name="Do not search system C++ directories (-nostdinc++)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.preprocessor.nostdincpp" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.shortenums.561358169" name="Short enumerations (-fshort-enums)" superClass="org.eclipse.cdt.cross.arm.gnu.cpp.compiler.option.optimization.shortenums" useByScannerDiscovery="false" value="true" valueType="boolean"/>
