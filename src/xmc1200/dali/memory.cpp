@@ -346,14 +346,14 @@ size_t Memory::dataSize() {
 }
 
 size_t Memory::dataWrite(uintptr_t addr, const uint8_t* data, size_t size) {
-  if (addr + size > FLASH_MEMORY_SIZE) {
+  if (addr > FLASH_MEMORY_SIZE || addr + size > FLASH_MEMORY_SIZE) {
     return 0;
   }
   return ((FlashMemory*) mHandle)->write(addr, data, size);
 }
 
 const uint8_t* Memory::data(uintptr_t addr, size_t size) {
-  if (addr + size > FLASH_MEMORY_SIZE) {
+  if (addr > FLASH_MEMORY_SIZE || addr + size > FLASH_MEMORY_SIZE) {
     return nullptr;
   }
   return ((FlashMemory*) mHandle)->getData(addr);
@@ -364,14 +364,14 @@ size_t Memory::tempSize() {
 }
 
 size_t Memory::tempWrite(uintptr_t addr, const uint8_t* data, size_t size) {
-  if (addr + size > TEMP_SIZE) {
+  if (addr > TEMP_SIZE || addr + size > TEMP_SIZE) {
     return 0;
   }
   return ((FlashMemory*) mHandle)->write(mTempAddr + addr, data, size);
 }
 
 const uint8_t* Memory::tempData(uintptr_t addr, size_t size) {
-  if (addr + size > TEMP_SIZE) {
+  if (addr > TEMP_SIZE || addr + size > TEMP_SIZE) {
     return nullptr;
   }
   return ((FlashMemory*) mHandle)->getData(mTempAddr + addr);
