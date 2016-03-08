@@ -29,6 +29,28 @@ public:
   void notifyPowerUp();
   void notifyPowerDown();
 
+protected:
+  Slave(controller::Memory* memory, controller::Lamp* lamp, controller::QueryStore* queryStore,
+        controller::Bus* busDriver, controller::Initialization* initializationController);
+
+  controller::Memory* const getMemoryController() {
+    return mMemoryController;
+  }
+
+  controller::Lamp* const getLampController() {
+    return mLampController;
+  }
+
+  controller::QueryStore* const getQueryStoreController() {
+    return mQueryStoreController;
+  }
+
+  Status sendAck(uint8_t ack) {
+     return mBusController->sendAck(ack);
+   }
+
+   virtual Status handleHandleDaliDeviceTypeCommand(uint16_t repeat, Command cmd, uint8_t param, uint8_t device_type);
+
 private:
   Slave(const Slave& other) = delete;
   Slave& operator=(const Slave&) = delete;
@@ -43,15 +65,6 @@ private:
   Status handleCommand(uint16_t repeat, Command cmd, uint8_t param) override;
   Status handleIgnoredCommand(Command cmd, uint8_t param) override;
   Status internalHandleDaliDT8Command(uint16_t repeat, Command cmd, uint8_t param);
-
-  Status sendAck(uint8_t ack) {
-    return mBusController->sendAck(ack);
-  }
-
-  Status handleHandleDaliDeviceTypeCommand(uint16_t repeat, Command cmd, uint8_t param, uint8_t device_type);
-
-  Slave(controller::Memory* memory, controller::Lamp* lamp, controller::QueryStore* queryStore,
-      controller::Bus* busDriver, controller::Initialization* initializationController);
 
   controller::Memory* const mMemoryController;
   controller::Lamp* const mLampController;

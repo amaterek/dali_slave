@@ -89,20 +89,18 @@ public:
   uint8_t getActualLevel();
   Status setActualLevel(uint8_t level);
 
-  bool isValid() {
+  virtual bool isValid() {
     return isDataValid() && isTempValid();
   }
 
-  bool isReset();
-  Status reset();
+  virtual bool isReset();
+  virtual Status reset();
 
   uint16_t uint16FromDtrAndDtr1() {
     return ((uint16_t) mRam.dtr1 << 8) | mRam.dtr;
   }
 
-private:
-  Memory(const Memory& other) = delete;
-  Memory& operator=(const Memory&) = delete;
+protected:
 
   typedef struct __attribute__((__packed__)) {
     uint32_t randomAddr;
@@ -111,28 +109,6 @@ private:
     uint8_t reversed2;
     uint8_t reversed3;
   } Temp;
-
-  typedef struct __attribute__((__packed__)) {
-    uint8_t size; // BANK mandatory field
-    uint8_t crc;  // BANK mandatory field
-    uint8_t phisicalMinLevel;
-    uint8_t powerOnLevel;
-    uint8_t failureLevel;
-    uint8_t minLevel;
-    uint8_t maxLevel;
-    uint8_t fadeRate;
-    uint8_t fadeTime;
-    uint8_t shortAddr;
-    uint16_t groups;
-    uint8_t scene[16];
-  } Data;
-
-  typedef struct {
-    uint8_t dtr;
-    uint8_t dtr1;
-    uint8_t dtr2;
-    uint32_t searchAddr;
-  } Ram;
 
   Status internalBankWrite(uint8_t bank, uint8_t addr, uint8_t* data, uint8_t size);
 
@@ -165,8 +141,34 @@ private:
   }
 
   Status writeData(uintptr_t addr, uint8_t* data, size_t size) {
-     return internalBankWrite(2, addr, data, size);
-   }
+    return internalBankWrite(2, addr, data, size);
+  }
+
+private:
+  Memory(const Memory& other) = delete;
+  Memory& operator=(const Memory&) = delete;
+
+  typedef struct __attribute__((__packed__)) {
+    uint8_t size; // BANK mandatory field
+    uint8_t crc;  // BANK mandatory field
+    uint8_t phisicalMinLevel;
+    uint8_t powerOnLevel;
+    uint8_t failureLevel;
+    uint8_t minLevel;
+    uint8_t maxLevel;
+    uint8_t fadeRate;
+    uint8_t fadeTime;
+    uint8_t shortAddr;
+    uint16_t groups;
+    uint8_t scene[16];
+  } Data;
+
+  typedef struct {
+    uint8_t dtr;
+    uint8_t dtr1;
+    uint8_t dtr2;
+    uint32_t searchAddr;
+  } Ram;
 
   Status bankWrite(uint8_t bank, uint8_t addr, uint8_t data, bool force);
   Status bankRead(uint8_t bank, uint8_t addr, uint8_t* data);

@@ -48,20 +48,35 @@ public:
   void setListener(Listener* listener);
   void notifyPowerDown();
 
-  Status powerDirect(uint8_t level, uint64_t time);
-  Status powerOff();
-  Status powerScene(uint8_t scene);
-  Status powerUp();
-  Status powerDown();
-  Status powerStepUp();
-  Status powerStepDown();
-  Status powerOnAndStepUp();
-  Status powerStepDownAndOff();
-  Status powerRecallMinLevel();
-  Status powerRecallMaxLevel();
-  Status powerRecallOnLevel();
-  Status powerRecallFaliureLevel();
+  virtual Status powerDirect(uint8_t level, uint64_t time);
+  virtual Status powerOff();
+  virtual Status powerScene(uint8_t scene);
+  virtual Status powerUp();
+  virtual Status powerDown();
+  virtual Status powerStepUp();
+  virtual Status powerStepDown();
+  virtual Status powerOnAndStepUp();
+  virtual Status powerStepDownAndOff();
+  virtual Status powerRecallMinLevel();
+  virtual Status powerRecallMaxLevel();
+  virtual Status powerRecallOnLevel();
+  virtual Status powerRecallFaliureLevel();
   Status enableDapcSequence(uint64_t time);
+
+protected:
+  ILamp* const getLamp() {
+    return mLamp;
+  }
+
+  Memory* const getMemoryController() {
+    return mMemoryController;
+  }
+  enum class Mode {
+    NORMAL,
+    CONSTANT_POWER,
+  };
+
+  void setMode(Mode mode, uint8_t param, uint32_t fadeTime);
 
 private:
   Lamp(const Lamp& other) = delete;
@@ -76,6 +91,7 @@ private:
 
   ILamp* const mLamp;
   Memory* const mMemoryController;
+  Mode mMode;
   ILamp::ILampState mLampState;
   Listener* mListener;
   bool mIsPowerSet;

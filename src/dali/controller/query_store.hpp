@@ -24,15 +24,15 @@ public:
   virtual ~QueryStore() {};
 
   Status reset();
-  Status storeActualLevelInDtr();
+  virtual Status storeActualLevelInDtr();
   Status storeDtrAsMaxLevel();
   Status storeDtrAsMinLevel();
-  Status storeDtrAsFailureLevel();
-  Status storePowerOnLevel();
+  virtual Status storeDtrAsFailureLevel();
+  virtual Status storePowerOnLevel();
   Status storeDtrAsFadeTime();
   Status storeDtrAsFadeRate();
-  Status storeDtrAsScene(uint8_t scene);
-  Status removeFromScene(uint8_t scene);
+  virtual Status storeDtrAsScene(uint8_t scene);
+  virtual Status removeFromScene(uint8_t scene);
   Status addToGroup(uint8_t group);
   Status removeFromGroup(uint8_t group);
   Status storeDtrAsShortAddr();
@@ -40,22 +40,31 @@ public:
   bool queryLampFailure();
   bool queryLampPowerOn();
   bool queryLampLimitError();
-  bool queryIsFading();
+  virtual bool queryIsFading();
   bool queryResetState();
   bool queryMissingShortAddr();
   bool queryLampPowerSet();
-  uint8_t queryActualLevel();
+  virtual uint8_t queryActualLevel();
   uint8_t queryMaxLevel();
   uint8_t queryMinLevel();
-  uint8_t queryPowerOnLevel();
-  uint8_t queryFaliureLevel();
+  virtual uint8_t queryPowerOnLevel();
+  virtual uint8_t queryFaliureLevel();
   uint8_t queryFadeRateOrTime();
-  uint8_t queryLevelForScene(uint8_t scene);
+  virtual uint8_t queryLevelForScene(uint8_t scene);
   uint8_t queryGroupsL();
   uint8_t queryGroupsH();
   uint8_t queryRandomAddrH();
   uint8_t queryRandomAddrM();
   uint8_t queryRandomAddrL();
+
+protected:
+  Memory* const getMemoryController() {
+    return mMemoryController;
+  }
+
+  Lamp* const getLampController() {
+    return mLampController;
+  }
 
 private:
   bool isMemoryValid();

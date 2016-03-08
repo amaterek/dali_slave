@@ -20,6 +20,7 @@ namespace controller {
 Lamp::Lamp(ILamp* lamp, Memory* memoryController)
     : mLamp(lamp)
     , mMemoryController(memoryController)
+    , mMode(Mode::NORMAL)
     , mLampState(ILamp::ILampState::OK)
     , mListener(nullptr)
     , mIsPowerSet(false)
@@ -66,7 +67,7 @@ bool Lamp::isPowerSet() {
 }
 
 uint8_t Lamp::getLevel() {
-  if (mLampState == ILamp::ILampState::OK) {
+  if ((mMode == Mode::NORMAL) && (mLampState == ILamp::ILampState::OK)) {
     return driver2level(mLamp->getLevel(), mMemoryController->getMinLevel());
   }
   return mMemoryController->getActualLevel();
@@ -89,7 +90,9 @@ Status Lamp::setLevel(uint8_t level, uint32_t fadeTime) {
       level = maxLevel;
     }
 
+    if ((mMode == Mode::NORMAL) || (level == 0)) {
     mLamp->setLevel(level2driver(level), fadeTime);
+    }
     status = mMemoryController->setActualLevel(level);
   }
   return status;
@@ -287,6 +290,26 @@ void Lamp::onPowerCommand() {
 void Lamp::onLampStateChnaged(ILamp::ILampState state) {
   mLampState = state;
   mListener->onLampStateChnaged(state);
+}
+
+void Lamp::setMode(Mode mode, uint8_t param, uint32_t fadeTime) {
+  switch (mode) {
+  case Mode::NORMAL:
+    mConstPower = DALI_MASK;
+    if (mMode != mode) {
+      mMode = mode;
+      mLamp->setLevel(level2driver(mMemoryController->getActualLevel()), fadeTime);
+    }
+    break;
+
+  case Mode::CONSTANT_POWER:
+    if ((mMode != mode) || (mConstPower != param)) {
+      mMode = mode;
+      mConstPower = param;
+      mLamp->setLevel(level2driver(DALI_LEVEL_MAX), fadeTime);
+    }
+    break;
+  }
 }
 
 } // namespace controller
