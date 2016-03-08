@@ -11,13 +11,13 @@
 #ifndef XMC_DALI_LAMP_HPP_
 #define XMC_DALI_LAMP_HPP_
 
-#include <dali/dali.hpp>
+#include <dali/dali_dt8.hpp>
 #include <xmc1200/bccu.hpp>
 
 namespace dali {
 namespace xmc {
 
-class LampRGB: public dali::ILamp {
+class LampRGB: public dali::ILampDT8 {
 public:
 
   static LampRGB* getInstance();
@@ -29,6 +29,12 @@ public:
   bool isFading() override;
   void abortFading() override;
   void waitForFade();
+
+  void setPrimary(const uint16_t primary[], uint8_t size, uint32_t changeTime) override;
+  void getPrimary(uint16_t primary[], uint8_t size) override;
+  bool isColorChanging() override;
+  void abortColorChanging() override;
+  void waitForColorChange();
 
   bool isOff() {
     return getLevel() == 0;
@@ -48,6 +54,7 @@ private:
   ILampClient* mClients[kMaxClients];
   ::xmc::BccuLampRGB mLamp;
   uint16_t mLevel;
+  uint16_t mPrimary[3];
 };
 
 

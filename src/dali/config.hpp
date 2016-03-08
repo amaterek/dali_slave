@@ -14,11 +14,13 @@
 #define DALI_VERSION 1
 #define DALI_DEVICE_TYPE 8
 
-#define DALI_BANKS 3
+#define DALI_BANKS 5
 #define DALI_BANK0_ADDR 0   // Bank 0 (16 bytes) according to 62386-102
 #define DALI_BANK1_ADDR 16  // Bank 1 (16 bytes) according to 62386-102
 #define DALI_BANK2_ADDR 32  // Bank 2 (28 bytes) data 62386-102 (26 bytes)
-#define DALI_BANK3_ADDR 60
+#define DALI_BANK3_ADDR 60  // Bank 3 (44 bytes) configuration DT8 62386-209
+#define DALI_BANK4_ADDR 104 // Bank 4 (148 bytes) data DT8 62386-209
+#define DALI_BANK5_ADDR 252
 
 #define DALI_PHISICAL_MIN_LEVEL 1
 

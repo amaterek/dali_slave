@@ -10,13 +10,11 @@
 
 #if (CPU_CLOCK == 32000000)
 #define XMC_CPU_FREQ xmc::Clock::FREQ_32MHZ
-#elif (CPU_CLOCK == 16000000)
-#define XMC_CPU_FREQ xmc::Clock::FREQ_16MHZ
 #else
 #error Unsupported CPU clock
 #endif
 
-#include <dali/slave.hpp>
+#include <dali/slave_dt8.hpp>
 
 #include <xmc1200/clock.hpp>
 #include <xmc1200/dali/bus.hpp>
@@ -78,7 +76,7 @@ int main(void) {
 
   dali::xmc::Memory* daliMemory1 = dali::xmc::Memory::getInstance();
   dali::xmc::LampRGB* daliLamp1 = dali::xmc::LampRGB::getInstance();
-  gSlave = dali::Slave::create(daliMemory1, daliLamp1, daliBus, daliTimer);
+  gSlave = dali::SlaveDT8::create(daliMemory1, daliLamp1, daliBus, daliTimer);
 
   daliTimer->schedule(&gPowerOnTimerTask, 600, 0);
 

@@ -317,6 +317,10 @@ size_t Memory::getBankSize(uint8_t bank) {
     return DALI_BANK2_ADDR - DALI_BANK1_ADDR;
   case 2:
     return DALI_BANK3_ADDR - DALI_BANK2_ADDR;
+  case 3:
+    return DALI_BANK4_ADDR - DALI_BANK3_ADDR;
+  case 4:
+    return DALI_BANK5_ADDR - DALI_BANK4_ADDR;
   default:
     return 0;
   }
@@ -330,6 +334,10 @@ uintptr_t Memory::getBankAddr(uint8_t bank) {
     return DALI_BANK1_ADDR;
   case 2:
     return DALI_BANK2_ADDR;
+  case 3:
+    return DALI_BANK3_ADDR;
+  case 4:
+    return DALI_BANK4_ADDR;
   default:
     return INVALID_BANK_ADDR;
   }

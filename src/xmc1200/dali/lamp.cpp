@@ -117,6 +117,44 @@ void LampRGB::waitForFade() {
   }
 }
 
+
+void LampRGB::setPrimary(const uint16_t primary[], uint8_t size, uint32_t changeTime) {
+  for (uint8_t i = 0; i < 3; ++i) {
+    mPrimary[i] = primary[i];
+  }
+  mLamp.setColor(dali2driver(primary[0]), dali2driver(primary[1]), dali2driver(primary[2]), changeTime);
+}
+
+void LampRGB::getPrimary(uint16_t primary[], uint8_t size) {
+  if (isColorChanging()) {
+    primary[0] = driver2dali(mLamp.getColorR());
+    primary[1] = driver2dali(mLamp.getColorG());
+    primary[2] = driver2dali(mLamp.getColorB());
+  } else {
+    for (uint8_t i = 0; i < 3; ++i) {
+      mPrimary[i] = mPrimary[i];
+    }
+  }
+}
+
+bool LampRGB::isColorChanging() {
+  return mLamp.isColorChanging();
+}
+
+void LampRGB::abortColorChanging() {
+  if (mLamp.isColorChanging()) {
+    mLamp.abortColorChanging();
+    mPrimary[0] = driver2dali(mLamp.getColorR());
+    mPrimary[1] = driver2dali(mLamp.getColorG());
+    mPrimary[2] = driver2dali(mLamp.getColorB());
+  }
+}
+
+void LampRGB::waitForColorChange() {
+  while (mLamp.isColorChanging()) {
+  }
+}
+
 void LampRGB::onLampStateChnaged(ILampState state) {
   for (uint16_t i = 0; i < kMaxClients; ++i) {
     if (mClients[i] != nullptr) {
