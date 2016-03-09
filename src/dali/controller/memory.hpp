@@ -21,84 +21,61 @@ public:
   explicit Memory(IMemory* memory);
   virtual ~Memory() {};
 
-  uint8_t getDTR() {
-    return mRam.dtr;
-  }
-
-  void setDTR(uint8_t value) {
-    mRam.dtr = value;
-  }
-
-  uint8_t getDTR1() {
-    return mRam.dtr1;
-  }
-
-  void setDTR1(uint8_t value) {
-    mRam.dtr1 = value;
-  }
-
-  uint8_t getDTR2() {
-    return mRam.dtr2;
-  }
-
-  void setDTR2(uint8_t value) {
-    mRam.dtr2 = value;
-  }
+  uint8_t getDTR() { return mRam.dtr; }
+  void setDTR(uint8_t value) { mRam.dtr = value; }
+  uint8_t getDTR1() { return mRam.dtr1; }
+  void setDTR1(uint8_t value) {  mRam.dtr1 = value; }
+  uint8_t getDTR2() { return mRam.dtr2; }
+  void setDTR2(uint8_t value) {  mRam.dtr2 = value; }
 
   Status readMemory(uint8_t* data);
   Status writeMemory(uint8_t data);
 
-  uint8_t getPhisicalMinLevel();
+  uint8_t getPhisicalMinLevel() { return mData->phisicalMinLevel; }
   Status setPhisicalMinLevel(uint8_t level);
 
-  uint8_t getShortAddr();
+  uint8_t getShortAddr() { return mData->shortAddr; }
   Status setShortAddr(uint8_t addr);
 
-  uint8_t getMinLevel();
+  uint8_t getMinLevel() { return mData->minLevel; }
   Status setMinLevel(uint8_t level);
 
-  uint8_t getMaxLevel();
+  uint8_t getMaxLevel() { return mData->maxLevel; }
   Status setMaxLevel(uint8_t level);
 
-  uint8_t getPowerOnLevel();
+  uint8_t getPowerOnLevel() { return mData->powerOnLevel; }
   Status setPowerOnLevel(uint8_t level);
 
-  uint8_t getFaliureLevel();
+  uint8_t getFaliureLevel() { return mData->failureLevel; }
   Status setFaliureLevel(uint8_t level);
 
-  uint8_t getFadeTime();
+  uint8_t getFadeTime() { return mData->fadeTime; }
   Status setFadeTime(uint8_t fadeTime);
 
-  uint8_t getFadeRate();
+  uint8_t getFadeRate() { return mData->fadeRate; }
   Status setFadeRate(uint8_t fadeRate);
 
   uint8_t getLevelForScene(uint8_t scene);
   Status setLevelForScene(uint8_t scene, uint8_t level);
 
-  uint16_t getGroups();
-  uint8_t getGroupsL();
-  uint8_t getGroupsH();
+  uint16_t getGroups() { return mData->groups; }
   Status setGroups(uint16_t groups);
 
-  uint32_t getSearchAddr();
+  uint32_t getSearchAddr() { return mRam.searchAddr; }
   Status setSearchAddr(uint32_t searchAddr);
 
-  uint32_t getRandomAddr();
+  uint32_t getRandomAddr() { return mTemp->randomAddr; }
   Status setRandomAddr(uint32_t randomAddr);
 
-  uint8_t getActualLevel();
+  uint8_t getActualLevel() { return mTemp->actualLevel; }
   Status setActualLevel(uint8_t level);
 
-  virtual bool isValid() {
-    return isDataValid() && isTempValid();
-  }
+  virtual bool isValid() {  return isDataValid() && isTempValid(); }
 
   virtual bool isReset();
   virtual Status reset();
 
-  uint16_t uint16FromDtrAndDtr1() {
-    return ((uint16_t) mRam.dtr1 << 8) | mRam.dtr;
-  }
+  uint16_t uint16FromDtrAndDtr1() { return ((uint16_t) mRam.dtr1 << 8) | mRam.dtr; }
 
 protected:
 

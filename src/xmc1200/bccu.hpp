@@ -68,9 +68,19 @@ public:
   }
 
   void setColor(uint16_t R, uint16_t G, uint16_t B, uint32_t changeTime);
-  uint16_t getColorR();
-  uint16_t getColorG();
-  uint16_t getColorB();
+
+  uint16_t getColorR() {
+    return XMC_BCCU_CH_ReadIntensity(BCCU_CH_R);
+  }
+
+  uint16_t getColorG() {
+    return XMC_BCCU_CH_ReadIntensity(BCCU_CH_G);
+  }
+
+  uint16_t getColorB() {
+    return XMC_BCCU_CH_ReadIntensity(BCCU_CH_B);
+  }
+
 
 private:
   BCCU_CH_Type* BCCU_CH_R;

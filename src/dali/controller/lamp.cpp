@@ -40,10 +40,6 @@ void Lamp::onReset() {
   mIsPowerSet = true;
 }
 
-bool Lamp::isPowerOn() {
-  return (mLamp->getLevel() > 0);
-}
-
 bool Lamp::isFailure() {
   switch (mLampState) {
   case ILamp::ILampState::DISCONNECTED:
@@ -52,18 +48,6 @@ bool Lamp::isFailure() {
   default:
     return false;
   }
-}
-
-bool Lamp::isFading() {
-  return mLamp->isFading();
-}
-
-bool Lamp::isLimitError() {
-  return mLimitError;
-}
-
-bool Lamp::isPowerSet() {
-  return mIsPowerSet;
 }
 
 uint8_t Lamp::getLevel() {
@@ -115,15 +99,7 @@ Status Lamp::abortFading() {
   return Status::OK;
 }
 
-void Lamp::setListener(Listener* listener) {
-  mListener = listener;
-}
-
-void Lamp::notifyPowerDown() {
-  mLamp->setLevel(0, 0);
-}
-
-Status Lamp::powerDirect(uint8_t level, uint64_t time) {
+Status Lamp::powerDirect(uint8_t level, Time time) {
   if (level == DALI_MASK) {
     mLamp->abortFading();
     return Status::OK;
@@ -259,12 +235,12 @@ Status Lamp::powerRecallFaliureLevel() {
   return setLevel(level, 0);
 }
 
-Status Lamp::enableDapcSequence(uint64_t time) {
+Status Lamp::enableDapcSequence(Time time) {
   mDapcTime = time;
   return Status::OK;
 }
 
-Status Lamp::dapcSequence(uint8_t level, uint64_t time) {
+Status Lamp::dapcSequence(uint8_t level, Time time) {
   onPowerCommand();
   mDapcTime = time;
   uint8_t actualLevel = getLevel();

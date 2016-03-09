@@ -20,14 +20,14 @@ class Timer: public dali::ITimer {
 public:
   static Timer* getInstance();
 
-  uint64_t getTime() override {
+  Time getTime() override {
     return getTimeMs();
   }
   dali::Status schedule(ITimerTask* task, uint32_t delay, uint32_t period) override;
   void cancel(ITimerTask* task) override;
   uint32_t randomize() override;
 
-  static uint64_t getTimeMs();
+  static Time getTimeMs();
   static void runSlice();
 
 private:

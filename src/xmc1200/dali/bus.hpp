@@ -16,7 +16,7 @@
 namespace dali {
 namespace xmc {
 
-class Bus: public dali::IBus {
+class Bus: public dali::IBusDriver {
 public:
   static Bus* getInstance();
 
@@ -33,11 +33,11 @@ private:
 
   ~Bus();
 
-  static void onDataReceived(uint64_t timeMs, uint16_t data);
+  static void onDataReceived(Time timeMs, uint16_t data);
   static void onBusStateChanged(IBusState state);
 
   static void initRx();
-  static bool checkRxTx(uint64_t time, uint16_t* data);
+  static bool checkRxTx(Time time, uint16_t* data);
 
   static void initTx();
   static void tx(uint8_t data);

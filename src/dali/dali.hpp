@@ -39,6 +39,9 @@
 
 namespace dali {
 
+typedef uint64_t Time;
+const Time kTimeInvalid = 0xffffffffffffffffUL;
+
 enum class Status {
   OK, ERROR, INVALID, INVALID_STATE, REPEAT_REQUIRED
 };
@@ -73,7 +76,7 @@ public:
   virtual void abortFading() = 0;
 };
 
-class IBus {
+class IBusDriver {
 public:
   enum class IBusState {
     UNKNOWN, DISCONNECTED, CONNECTED
@@ -81,7 +84,7 @@ public:
 
   class IBusClient {
   public:
-    virtual void onDataReceived(uint64_t timeMs, uint16_t data) = 0;
+    virtual void onDataReceived(Time time, uint16_t data) = 0;
     virtual void onBusStateChanged(IBusState state);
   };
 
@@ -97,7 +100,7 @@ public:
     virtual void timerTaskRun() = 0;
   };
 
-  virtual uint64_t getTime() = 0;
+  virtual Time getTime() = 0;
   virtual Status schedule(ITimerTask* task, uint32_t delay, uint32_t period) = 0;
   virtual void cancel(ITimerTask* task) = 0;
   virtual uint32_t randomize() = 0;

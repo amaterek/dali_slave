@@ -31,24 +31,26 @@ public:
 
 // >>> used only in controller namespace
   void onReset();
-  bool isPowerOn();
+  bool isPowerOn() { return (mLamp->getLevel() > 0); }
   bool isFailure();
-  bool isFading();
-  bool isLimitError();
-  bool isPowerSet();
+  bool isFading() { return mLamp->isFading(); }
+  bool isLimitError() { return mLimitError; }
+  bool isPowerSet() { return mIsPowerSet; }
 
   uint8_t getLevel();
   Status setLevel(uint8_t level, uint32_t fadeTime);
+
   uint32_t getFadeTime();
   uint32_t getFadeRate();
 
   Status abortFading();
 // <<< used only in controller namespace
 
-  void setListener(Listener* listener);
-  void notifyPowerDown();
+  void setListener(Listener* listener) { mListener = listener; }
 
-  virtual Status powerDirect(uint8_t level, uint64_t time);
+  void notifyPowerDown() { mLamp->setLevel(0, 0); }
+
+  virtual Status powerDirect(uint8_t level, Time time);
   virtual Status powerOff();
   virtual Status powerScene(uint8_t scene);
   virtual Status powerUp();
@@ -61,16 +63,12 @@ public:
   virtual Status powerRecallMaxLevel();
   virtual Status powerRecallOnLevel();
   virtual Status powerRecallFaliureLevel();
-  Status enableDapcSequence(uint64_t time);
+  Status enableDapcSequence(Time time);
 
 protected:
-  ILamp* const getLamp() {
-    return mLamp;
-  }
+  ILamp* const getLamp() { return mLamp; }
+  Memory* const getMemoryController() { return mMemoryController; }
 
-  Memory* const getMemoryController() {
-    return mMemoryController;
-  }
   enum class Mode {
     NORMAL,
     CONSTANT_POWER,
@@ -82,7 +80,7 @@ private:
   Lamp(const Lamp& other) = delete;
   Lamp& operator=(const Lamp&) = delete;
 
-  Status dapcSequence(uint8_t level, uint64_t time);
+  Status dapcSequence(uint8_t level, Time time);
 
   void onPowerCommand();
 
@@ -96,7 +94,7 @@ private:
   Listener* mListener;
   bool mIsPowerSet;
   bool mLimitError;
-  uint64_t mDapcTime;
+  Time mDapcTime;
   uint8_t mConstPower;
 };
 

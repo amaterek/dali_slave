@@ -28,13 +28,13 @@ public:
   uint16_t getLevel() override;
   bool isFading() override;
   void abortFading() override;
-  void waitForFade();
+  void waitForFade() { while (mLamp.isFading()); }
 
   void setPrimary(const uint16_t primary[], uint8_t size, uint32_t changeTime) override;
   void getPrimary(uint16_t primary[], uint8_t size) override;
   bool isColorChanging() override;
   void abortColorChanging() override;
-  void waitForColorChange();
+  void waitForColorChange() { while (mLamp.isColorChanging()); };
 
   bool isOff() {
     return getLevel() == 0;

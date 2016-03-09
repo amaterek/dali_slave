@@ -56,7 +56,7 @@ private:
 
   ITimer* const mTimer;
   Memory* const mMemoryController;
-  uint64_t mInitializeTime;
+  Time mInitializeTime;
   bool mInitialized;
   bool mWithdraw;
   Selection mSelected;

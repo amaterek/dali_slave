@@ -76,7 +76,7 @@ int main(void) {
 
   dali::xmc::Memory* daliMemory1 = dali::xmc::Memory::getInstance();
   dali::xmc::LampRGB* daliLamp1 = dali::xmc::LampRGB::getInstance();
-  gSlave = dali::SlaveDT8::create(daliMemory1, daliLamp1, daliBus, daliTimer);
+  gSlave = dali::SlaveDT8::create(daliBus, daliTimer, daliMemory1, daliLamp1);
 
   daliTimer->schedule(&gPowerOnTimerTask, 600, 0);
 

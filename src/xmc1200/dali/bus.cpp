@@ -45,17 +45,15 @@ volatile RxState gRxState;
 volatile uint32_t gRxData32 = INVALID32;
 volatile uint32_t gRxDataTmp;
 uint16_t gTxData = INVALID16;
-volatile uint64_t gBusLowTime = 0;
-
-#define BUS_TIME_CONNECTED 0xffffffffffffffffUL
+volatile Time gBusLowTime = 0;
 
 #define MAX_CLIENTS 1
 
-IBus::IBusState gBusState = IBus::IBusState::UNKNOWN;
-IBus::IBusClient* gClients[MAX_CLIENTS];
+IBusDriver::IBusState gBusState = IBusDriver::IBusState::UNKNOWN;
+IBusDriver::IBusClient* gClients[MAX_CLIENTS];
 
 void onRisingEdge(uint16_t timer) {
-  gBusLowTime = BUS_TIME_CONNECTED;
+  gBusLowTime = kTimeInvalid;
 
   if (timer == 0) {
     return;
@@ -218,20 +216,20 @@ Status Bus::sendAck(uint8_t ack) {
 
 void Bus::runSlice() {
   uint16_t data;
-  uint64_t time = Timer::getTimeMs();
+  Time time = Timer::getTimeMs();
 
   __disable_irq();
-  uint64_t busLowTime = gBusLowTime;
+  Time busLowTime = gBusLowTime;
   __enable_irq();
 
-  if (busLowTime == BUS_TIME_CONNECTED) {
-    if (gBusState != IBus::IBusState::CONNECTED) {
-      onBusStateChanged(IBus::IBusState::CONNECTED);
+  if (busLowTime == kTimeInvalid) {
+    if (gBusState != IBusDriver::IBusState::CONNECTED) {
+      onBusStateChanged(IBusDriver::IBusState::CONNECTED);
     }
   } else {
     if (time - busLowTime >= 500) {
-      if (gBusState != IBus::IBusState::DISCONNECTED) {
-        onBusStateChanged(IBus::IBusState::DISCONNECTED);
+      if (gBusState != IBusDriver::IBusState::DISCONNECTED) {
+        onBusStateChanged(IBusDriver::IBusState::DISCONNECTED);
       }
     }
   }
@@ -242,7 +240,7 @@ void Bus::runSlice() {
 }
 
 // static
-void Bus::onDataReceived(uint64_t time, uint16_t data) {
+void Bus::onDataReceived(Time time, uint16_t data) {
   for (uint8_t i = 0; i < MAX_CLIENTS; ++i) {
     if (gClients[i] != nullptr) {
       gClients[i]->onDataReceived(time, data);
@@ -298,8 +296,8 @@ void Bus::initRx() {
 }
 
 //static
-bool Bus::checkRxTx(uint64_t time, uint16_t* data) {
-  static uint64_t gLastDataTime = 0;
+bool Bus::checkRxTx(Time time, uint16_t* data) {
+  static Time gLastDataTime = 0;
   bool rxResult = false;
   __disable_irq();
   uint32_t rxData32 = gRxData32;
@@ -313,7 +311,7 @@ bool Bus::checkRxTx(uint64_t time, uint16_t* data) {
   }
 
   if (gTxData != INVALID16) {
-    uint64_t dTime = time - gLastDataTime;
+    Time dTime = time - gLastDataTime;
     if (dTime > 3) {
       if (gRxState == RxState::IDLE) {
         uint16_t tmpTxData = gTxData;

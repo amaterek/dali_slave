@@ -23,8 +23,6 @@ public:
     FREQ_16MHZ = 0x02,
     FREQ_10_67MHZ = 0x03,
     FREQ_8MHZ = 0x04,
-    FREQ_126KHZ = 0xFE,
-    FREQ_125_5KHZ = 0xFF,
   } Frequency;
 
   // Initializes SCU Clock registers based on user configuration

@@ -16,10 +16,10 @@
 namespace dali {
 namespace controller {
 
-class Bus: public IBus::IBusClient {
+class Bus: public IBusDriver::IBusClient {
 public:
 
-  class Listener {
+  class Client {
   public:
     virtual uint8_t getShortAddr() = 0;
     virtual uint16_t getGroups() = 0;
@@ -28,31 +28,27 @@ public:
     virtual void onBusDisconnected() = 0;
   };
 
-  explicit Bus(IBus* bus);
+  explicit Bus(IBusDriver* bus, Client* client);
   virtual ~Bus();
 
-  void setListener(Listener* listener);
+  Status sendAck(uint8_t ack) { return mBus->sendAck(ack); }
+  Time getLastCommandTime() { return mLastCommandTime; }
 
-  void onDataReceived(uint64_t timeMs, uint16_t data) override;
-  void onBusStateChanged(IBus::IBusState state) override;
-
-  Status sendAck(uint8_t ack);
-  uint64_t getLastCommandTimeMs() {
-    return mLastCommandTimeMs;
-  }
+  void onDataReceived(Time time, uint16_t data) override;
+  void onBusStateChanged(IBusDriver::IBusState state) override;
 
 private:
   Bus(const Bus& other) = delete;
   Bus& operator=(const Bus&) = delete;
 
-  Status filterAddress(uint16_t data, Command* command, uint8_t* param);
+  Command extractCommand(uint16_t data, uint8_t* param);
 
-  IBus* const mBus;
-  IBus::IBusState mState;
-  Listener* mListener;
+  IBusDriver* const mBus;
+  Client* mClient;
+  IBusDriver::IBusState mState;
   Command mLastCommand;
   uint16_t mCommandRepeatCount;
-  uint64_t mLastCommandTimeMs;
+  Time mLastCommandTime;
 };
 
 } // namespace controller

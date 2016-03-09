@@ -112,12 +112,6 @@ void LampRGB::abortFading() {
   }
 }
 
-void LampRGB::waitForFade() {
-  while (mLamp.isFading()) {
-  }
-}
-
-
 void LampRGB::setPrimary(const uint16_t primary[], uint8_t size, uint32_t changeTime) {
   for (uint8_t i = 0; i < 3; ++i) {
     mPrimary[i] = primary[i];
@@ -150,10 +144,6 @@ void LampRGB::abortColorChanging() {
   }
 }
 
-void LampRGB::waitForColorChange() {
-  while (mLamp.isColorChanging()) {
-  }
-}
 
 void LampRGB::onLampStateChnaged(ILampState state) {
   for (uint16_t i = 0; i < kMaxClients; ++i) {

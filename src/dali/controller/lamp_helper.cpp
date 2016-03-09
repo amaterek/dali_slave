@@ -295,7 +295,24 @@ const uint32_t kFadeTime[16] = { // fade times from 0 to 254 in milliseconds
     90510, // 15
 };
 
-const uint8_t kStepsFor200FadeRate[16] = { 1, 72, 51, 36, 25, 18, 13, 9, 6, 4, 3, 2, 2, 1, 1, 1 };
+const uint8_t kStepsFor200FadeRate[16] = {
+    1,  // 0
+    72, // 1
+    51, // 2
+    36, // 3
+    25, // 4
+    18, // 5
+    13, // 6
+    9,  // 7
+    6,  // 8
+    4,  // 9
+    3,  // 10
+    2,  // 11
+    2,  // 12
+    1,  // 13
+    1,  // 14
+    1   // 15
+};
 
 uint16_t level2driver(uint8_t level) {
   return kLevel2driver[level];

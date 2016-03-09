@@ -13,30 +13,28 @@
 namespace dali {
 
 // static
-Slave* Slave::create(IMemory* memoryDriver, ILamp* lampDriver, IBus* busDriver, ITimer* timer) {
+Slave* Slave::create(IBusDriver* busDriver, ITimer* timer, IMemory* memoryDriver, ILamp* lampDriver) {
   controller::Memory* memory = new controller::Memory(memoryDriver);
   controller::Lamp* lamp = new controller::Lamp(lampDriver, memory);
   controller::QueryStore* queryStore = new controller::QueryStore(memory, lamp);
-  controller::Bus* bus = new controller::Bus(busDriver);
-  controller::Initialization* initialization = new controller::Initialization(timer, memory);
 
-  return new Slave(memory, lamp, queryStore, bus, initialization);
+  return new Slave(busDriver, timer, memory, lamp, queryStore);
 }
 
-Slave::Slave(controller::Memory* memory, controller::Lamp* lamp, controller::QueryStore* queryStore,
-    controller::Bus* bus, controller::Initialization* initialization) :
-    mMemoryController(memory), mLampController(lamp), mQueryStoreController(queryStore),
-    mBusController(bus), mInitializationController(initialization),
-    mMemoryWriteEnabled(false), mDeviceType(0xff) {
+Slave::Slave(IBusDriver* busDriver, ITimer* timer, controller::Memory* memory, controller::Lamp* lamp,
+    controller::QueryStore* queryStore) :
+    mBusController(busDriver, this),
+    mInitializationController(timer, memory),
+    mMemoryController(memory),
+    mLampController(lamp),
+    mQueryStoreController(queryStore),
+    mMemoryWriteEnabled(false),
+    mDeviceType(0xff) {
   mLampController->setListener(this);
-  mBusController->setListener(this);
 }
 
 Slave::~Slave() {
-  mBusController->setListener(nullptr);
   mLampController->setListener(nullptr);
-  delete mInitializationController;
-  delete mBusController;
   delete mQueryStoreController;
   delete mLampController;
   delete mMemoryController;
@@ -51,7 +49,7 @@ void Slave::notifyPowerDown() {
 }
 
 void Slave::onLampStateChnaged(ILamp::ILampState state) {
-  mInitializationController->onLampStateChnaged(state);
+  mInitializationController.onLampStateChnaged(state);
 }
 
 uint8_t Slave::getShortAddr() {
@@ -130,7 +128,7 @@ Status Slave::internalHandleDaliDT8Command(uint16_t repeatCount, Command cmd, ui
     return mLampController->powerOnAndStepUp();
 
   case Command::ENABLE_DAPC_SEQUENCE:
-    return mLampController->enableDapcSequence(mBusController->getLastCommandTimeMs());
+    return mLampController->enableDapcSequence(mBusController.getLastCommandTime());
 
   case Command::GO_TO_SCENE_0:
   case Command::GO_TO_SCENE_1:
@@ -154,7 +152,7 @@ Status Slave::internalHandleDaliDT8Command(uint16_t repeatCount, Command cmd, ui
     if (repeatCount == 0) {
       return Status::REPEAT_REQUIRED;
     }
-    mInitializationController->reset();
+    mInitializationController.reset();
     mQueryStoreController->reset();
     return Status::OK;
 
@@ -420,10 +418,10 @@ Status Slave::internalHandleDaliDT8Command(uint16_t repeatCount, Command cmd, ui
     // extended commands
 
   case Command::DIRECT_POWER_CONTROL:
-    return mLampController->powerDirect(param, mBusController->getLastCommandTimeMs());
+    return mLampController->powerDirect(param, mBusController.getLastCommandTime());
 
   case Command::TERMINATE:
-    return mInitializationController->terminate();
+    return mInitializationController.terminate();
 
   case Command::DATA_TRANSFER_REGISTER:
     mMemoryController->setDTR(param);
@@ -433,53 +431,53 @@ Status Slave::internalHandleDaliDT8Command(uint16_t repeatCount, Command cmd, ui
     if (repeatCount == 0) {
       return Status::REPEAT_REQUIRED;
     }
-    return mInitializationController->initialize(param);
+    return mInitializationController.initialize(param);
 
   case Command::RANDOMISE:
     if (repeatCount == 0) {
       return Status::REPEAT_REQUIRED;
     }
-    return mInitializationController->randomize();
+    return mInitializationController.randomize();
 
   case Command::COMPARE: {
-    Status status = mInitializationController->compare();
+    Status status = mInitializationController.compare();
     if (status == Status::OK) {
-      return mBusController->sendAck(DALI_ACK_YES);
+      return mBusController.sendAck(DALI_ACK_YES);
     }
     return status;
   }
   case Command::WITHDRAW:
-    return mInitializationController->withdraw();
+    return mInitializationController.withdraw();
 
   case Command::SEARCHADDRH:
-    return mInitializationController->searchAddrH(param);
+    return mInitializationController.searchAddrH(param);
 
   case Command::SEARCHADDRM:
-    return mInitializationController->searchAddrM(param);
+    return mInitializationController.searchAddrM(param);
 
   case Command::SEARCHADDRL:
-    return mInitializationController->searchAddrL(param);
+    return mInitializationController.searchAddrL(param);
 
   case Command::PROGRAM_SHORT_ADDRESS:
-    return mInitializationController->programShortAddr(param);
+    return mInitializationController.programShortAddr(param);
 
   case Command::VERIFY_SHORT_ADDRESS: {
-    Status status = mInitializationController->verifySortAddr(param);
+    Status status = mInitializationController.verifySortAddr(param);
     if (status == Status::OK) {
-      return mBusController->sendAck(DALI_ACK_YES);
+      return mBusController.sendAck(DALI_ACK_YES);
     }
     return status;
   }
   case Command::QUERY_SHORT_ADDRESS: {
     uint8_t shortAddr;
-    Status status = mInitializationController->queryShortAddr(&shortAddr);
+    Status status = mInitializationController.queryShortAddr(&shortAddr);
     if (status == Status::OK) {
-      return mBusController->sendAck(shortAddr);
+      return mBusController.sendAck(shortAddr);
     }
     return status;
   }
   case Command::PHYSICAL_SELECTION:
-    return mInitializationController->physicalSelection();
+    return mInitializationController.physicalSelection();
 
   case Command::DATA_TRANSFER_REGISTER_1:
     mMemoryController->setDTR1(param);

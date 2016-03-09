@@ -213,16 +213,4 @@ void BccuLampRGB::setColor(uint16_t r, uint16_t g, uint16_t b, uint32_t changeTi
   XMC_BCCU_ConcurrentStartLinearWalk(BCCU, mChannelsMask);
 }
 
-uint16_t BccuLampRGB::getColorR() {
-  return XMC_BCCU_CH_ReadIntensity(BCCU_CH_R);
-}
-
-uint16_t BccuLampRGB::getColorG() {
-  return XMC_BCCU_CH_ReadIntensity(BCCU_CH_G);
-}
-
-uint16_t BccuLampRGB::getColorB() {
-  return XMC_BCCU_CH_ReadIntensity(BCCU_CH_B);
-}
-
 } // namespace xmc

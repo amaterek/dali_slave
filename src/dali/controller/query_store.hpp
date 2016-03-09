@@ -37,16 +37,16 @@ public:
   Status removeFromGroup(uint8_t group);
   Status storeDtrAsShortAddr();
   uint8_t queryStatus();
-  bool queryLampFailure();
-  bool queryLampPowerOn();
-  bool queryLampLimitError();
+  bool queryLampFailure() { return mLampController->isFailure(); }
+  bool queryLampPowerOn() { return mLampController->isPowerOn(); }
+  bool queryLampLimitError() { return mLampController->isLimitError(); }
   virtual bool queryIsFading();
-  bool queryResetState();
-  bool queryMissingShortAddr();
-  bool queryLampPowerSet();
-  virtual uint8_t queryActualLevel();
-  uint8_t queryMaxLevel();
-  uint8_t queryMinLevel();
+  bool queryResetState() { return mMemoryController->isReset(); }
+  bool queryMissingShortAddr() { return mMemoryController->getShortAddr() == DALI_MASK; }
+  bool queryLampPowerSet() { return mLampController->isPowerSet(); }
+  virtual uint8_t queryActualLevel() { return mLampController->getLevel(); }
+  uint8_t queryMaxLevel() { return mMemoryController->getMaxLevel(); }
+  uint8_t queryMinLevel() { return mMemoryController->getMinLevel(); }
   virtual uint8_t queryPowerOnLevel();
   virtual uint8_t queryFaliureLevel();
   uint8_t queryFadeRateOrTime();
@@ -58,16 +58,11 @@ public:
   uint8_t queryRandomAddrL();
 
 protected:
-  Memory* const getMemoryController() {
-    return mMemoryController;
-  }
-
-  Lamp* const getLampController() {
-    return mLampController;
-  }
+  Memory* const getMemoryController() { return mMemoryController; }
+  Lamp* const getLampController() { return mLampController; }
 
 private:
-  bool isMemoryValid();
+  bool isMemoryValid() { return mMemoryController->isValid(); }
 
   QueryStore(const QueryStore& other) = delete;
   QueryStore& operator=(const QueryStore&) = delete;

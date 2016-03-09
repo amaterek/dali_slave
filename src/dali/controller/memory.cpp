@@ -77,16 +77,8 @@ Status Memory::writeMemory(uint8_t data) {
   return status;
 }
 
-uint8_t Memory::getPhisicalMinLevel() {
-  return mData->phisicalMinLevel;
-}
-
 Status Memory::setPhisicalMinLevel(uint8_t level) {
   return writeData8(DATA_FIELD_OFFSET(Data, phisicalMinLevel), level);
-}
-
-uint8_t Memory::getShortAddr() {
-  return mData->shortAddr;
 }
 
 Status Memory::setShortAddr(uint8_t addr) {
@@ -94,48 +86,24 @@ Status Memory::setShortAddr(uint8_t addr) {
   return writeData8(DATA_FIELD_OFFSET(Data, shortAddr), addr);
 }
 
-uint8_t Memory::getMinLevel() {
-  return mData->minLevel;
-}
-
 Status Memory::setMinLevel(uint8_t level) {
   return writeData8(DATA_FIELD_OFFSET(Data, minLevel), level);
-}
-
-uint8_t Memory::getMaxLevel() {
-  return mData->maxLevel;
 }
 
 Status Memory::setMaxLevel(uint8_t level) {
   return writeData8(DATA_FIELD_OFFSET(Data, maxLevel), level);
 }
 
-uint8_t Memory::getPowerOnLevel() {
-  return mData->powerOnLevel;
-}
-
 Status Memory::setPowerOnLevel(uint8_t level) {
   return writeData8(DATA_FIELD_OFFSET(Data, powerOnLevel), level);
-}
-
-uint8_t Memory::getFaliureLevel() {
-  return mData->failureLevel;
 }
 
 Status Memory::setFaliureLevel(uint8_t level) {
   return writeData8(DATA_FIELD_OFFSET(Data, failureLevel), level);
 }
 
-uint8_t Memory::getFadeTime() {
-  return mData->fadeTime;
-}
-
 Status Memory::setFadeTime(uint8_t fadeTime) {
   return writeData8(DATA_FIELD_OFFSET(Data, fadeTime), fadeTime);
-}
-
-uint8_t Memory::getFadeRate() {
-  return mData->fadeRate;
 }
 
 Status Memory::setFadeRate(uint8_t fadeRate) {
@@ -156,25 +124,8 @@ Status Memory::setLevelForScene(uint8_t scene, uint8_t level) {
   return writeData8(DATA_FIELD_OFFSET(Data, scene[scene]), level);
 }
 
-uint16_t Memory::getGroups() {
-  return mData->groups;
-}
-
-uint8_t Memory::getGroupsL() {
-  return mData->groups;
-}
-
-uint8_t Memory::getGroupsH() {
-  return mData->groups >> 8;
-}
-
 Status Memory::setGroups(uint16_t groups) {
   return writeData16(DATA_FIELD_OFFSET(Data, groups), groups);
-}
-
-
-uint32_t Memory::getSearchAddr() {
-  return mRam.searchAddr;
 }
 
 Status Memory::setSearchAddr(uint32_t searchAddr) {
@@ -182,17 +133,9 @@ Status Memory::setSearchAddr(uint32_t searchAddr) {
   return Status::OK;
 }
 
-uint32_t Memory::getRandomAddr() {
-  return mTemp->randomAddr;
-}
-
 Status Memory::setRandomAddr(uint32_t randomAddr) {
   randomAddr &= LONG_ADDR_MASK;
   return writeTemp32(TEMP_FIELD_OFFSET(Temp, randomAddr), randomAddr);
-}
-
-uint8_t Memory::getActualLevel() {
-  return mTemp->actualLevel;
 }
 
 Status Memory::setActualLevel(uint8_t level) {

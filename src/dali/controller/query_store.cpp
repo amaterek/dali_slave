@@ -159,44 +159,8 @@ uint8_t QueryStore::queryStatus() {
   return status;
 }
 
-bool QueryStore::queryLampFailure() {
-  return mLampController->isFailure();
-}
-
-bool QueryStore::queryLampPowerOn() {
-  return mLampController->isPowerOn();
-}
-
-bool QueryStore::queryLampLimitError() {
-  return mLampController->isLimitError();
-}
-
 bool QueryStore::queryIsFading() {
   return mLampController->isFading();
-}
-
-bool QueryStore::queryResetState() {
-  return mMemoryController->isReset();
-}
-
-bool QueryStore::queryMissingShortAddr() {
-  return mMemoryController->getShortAddr() == DALI_MASK;
-}
-
-bool QueryStore::queryLampPowerSet() {
-  return mLampController->isPowerSet();
-}
-
-uint8_t QueryStore::queryActualLevel() {
-  return mLampController->getLevel();
-}
-
-uint8_t QueryStore::queryMaxLevel() {
-  return mMemoryController->getMaxLevel();
-}
-
-uint8_t QueryStore::queryMinLevel() {
-  return mMemoryController->getMinLevel();
 }
 
 uint8_t QueryStore::queryPowerOnLevel() {
@@ -218,11 +182,11 @@ uint8_t QueryStore::queryLevelForScene(uint8_t scene) {
 }
 
 uint8_t QueryStore::queryGroupsL() {
-  return mMemoryController->getGroupsL();
+  return mMemoryController->getGroups() & 0xff;
 }
 
 uint8_t QueryStore::queryGroupsH() {
-  return mMemoryController->getGroupsH();
+  return mMemoryController->getGroups() >> 8;
 }
 
 uint8_t QueryStore::queryRandomAddrH() {
@@ -235,10 +199,6 @@ uint8_t QueryStore::queryRandomAddrM() {
 
 uint8_t QueryStore::queryRandomAddrL() {
   return (uint8_t) ((mMemoryController->getRandomAddr() >> 0) & 0xff);
-}
-
-bool QueryStore::isMemoryValid() {
-  return mMemoryController->isValid();
 }
 
 } // namespace controller

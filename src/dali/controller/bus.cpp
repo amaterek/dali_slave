@@ -16,17 +16,17 @@ namespace dali {
 namespace controller {
 namespace {
 
-const uint64_t kCommandRepeatTimeout = 100;
+const Time kCommandRepeatTimeout = 100;
 
 }
 
-Bus::Bus(IBus* bus) :
+Bus::Bus(IBusDriver* bus, Client* client) :
     mBus(bus),
-    mState(IBus::IBusState::UNKNOWN),
-    mListener(nullptr),
+    mClient(client),
+    mState(IBusDriver::IBusState::UNKNOWN),
     mLastCommand(Command::INVALID),
     mCommandRepeatCount(0),
-    mLastCommandTimeMs(0) {
+    mLastCommandTime(0) {
   mBus->registerClient(this);
 }
 
@@ -34,138 +34,128 @@ Bus::~Bus() {
   mBus->unregisterClient(this);
 }
 
-void Bus::setListener(Listener* listener) {
-  mListener = listener;
-}
+void Bus::onDataReceived(Time time, uint16_t data) {
 
-void Bus::onDataReceived(uint64_t timeMs, uint16_t data) {
-  Command command;
   uint8_t param;
-  if (filterAddress(data, &command, &param) != Status::OK) {
-    return; // Status::INVALID;
+  Command command = extractCommand(data, &param);
+  if (command == Command::INVALID) {
+    return;
   }
-  if (command != Command::INVALID) { // should be always true
-    if (mLastCommand == Command::INVALID) {
-      mCommandRepeatCount = 0;
-      mLastCommandTimeMs = timeMs;
-      Status status = mListener->handleCommand(mCommandRepeatCount, command, param);
-      if (status == Status::REPEAT_REQUIRED) {
-        mLastCommand = command;
-        return; // Status::OK;
-      } else {
-        mLastCommand = Command::INVALID;
-        return; // status;
-      }
-    } else if (mLastCommand == command) {
-      if (timeMs - mLastCommandTimeMs < kCommandRepeatTimeout) {
-        mCommandRepeatCount++;
-      } else {
-        mLastCommand = Command::INVALID;
-        mCommandRepeatCount = 0;
-      }
-      mLastCommandTimeMs = timeMs;
-      Status status = mListener->handleCommand(mCommandRepeatCount, command, param);
-      if (status == Status::REPEAT_REQUIRED) {
-        mLastCommand = command;
-        return; // Status::OK;
-      } else {
-        mLastCommand = Command::INVALID;
-        return; // status;
-      }
-    } else { // (mLastCommand != Command::INVALID) || (mLastCommand != cmd)
+  if (mLastCommand == Command::INVALID) {
+    mCommandRepeatCount = 0;
+    mLastCommandTime = time;
+    Status status = mClient->handleCommand(mCommandRepeatCount, command, param);
+    if (status == Status::REPEAT_REQUIRED) {
+      mLastCommand = command;
+      return;
+    } else {
+      mLastCommand = Command::INVALID;
+      return;
+    }
+  } else if (mLastCommand == command) {
+    if (time - mLastCommandTime < kCommandRepeatTimeout) {
+      mCommandRepeatCount++;
+    } else {
       mLastCommand = Command::INVALID;
       mCommandRepeatCount = 0;
-      if (timeMs - mLastCommandTimeMs < kCommandRepeatTimeout) {
-        mLastCommandTimeMs = timeMs;
-        mListener->handleIgnoredCommand(command, param);
+    }
+    mLastCommandTime = time;
+    Status status = mClient->handleCommand(mCommandRepeatCount, command, param);
+    if (status == Status::REPEAT_REQUIRED) {
+      mLastCommand = command;
+      return;
+    } else {
+      mLastCommand = Command::INVALID;
+      return;
+    }
+  } else { // (mLastCommand != Command::INVALID) || (mLastCommand != cmd)
+    mLastCommand = Command::INVALID;
+    mCommandRepeatCount = 0;
+    mLastCommandTime = time;
+    if (time - mLastCommandTime < kCommandRepeatTimeout) {
+      mClient->handleIgnoredCommand(command, param);
+    } else {
+      Status status = mClient->handleCommand(mCommandRepeatCount, command, param);
+      if (status == Status::REPEAT_REQUIRED) {
+        mLastCommand = command;
+        return;
       } else {
-        mLastCommandTimeMs = timeMs;
-        Status status = mListener->handleCommand(mCommandRepeatCount, command, param);
-        if (status == Status::REPEAT_REQUIRED) {
-          mLastCommand = command;
-          return; // Status::OK;
-        } else {
-          return; // status;
-        }
+        return;
       }
     }
   }
-  return; // Status::INVALID;
 }
 
-void Bus::onBusStateChanged(IBus::IBusState state) {
+void Bus::onBusStateChanged(IBusDriver::IBusState state) {
   if (mState != state) {
     mState = state;
-    if (state == IBus::IBusState::DISCONNECTED) {
-      mListener->onBusDisconnected();
+    if (state == IBusDriver::IBusState::DISCONNECTED) {
+      mClient->onBusDisconnected();
     }
   }
 }
 
-Status Bus::sendAck(uint8_t ack) {
-  return mBus->sendAck(ack);
-}
-
-Status Bus::filterAddress(uint16_t data, Command* command, uint8_t* param) {
-  *param = (uint8_t) (data & 0xff);
-  *command = Command::INVALID;
+Command Bus::extractCommand(uint16_t data, uint8_t* commandParam) {
+  Command command = Command::INVALID;
+  uint8_t param = (uint8_t) (data & 0xff);
   uint8_t addr = (uint8_t) (data >> 8);
   bool cmdBitSet = ((addr & 0x01) != 0);
   if ((addr & 0xfe) == 0xfe) {
     // Broadcast
     if (cmdBitSet) {
-      *command = (Command) *param;
-      *param = 0xff;
+      command = (Command) param;
+      param = 0xff;
     } else {
-      *command = Command::DIRECT_POWER_CONTROL;
+      command = Command::DIRECT_POWER_CONTROL;
     }
   } else if ((addr & 0x80) == 0) {
     // Short address
     addr >>= 1;
-    uint8_t myAddr = mListener->getShortAddr() >> 1;
+    uint8_t myAddr = mClient->getShortAddr() >> 1;
     if (cmdBitSet) {
-      *command = (Command) *param;
-      *param = 0xff;
+      command = (Command) param;
+      param = 0xff;
     } else {
-      *command = Command::DIRECT_POWER_CONTROL;
+      command = Command::DIRECT_POWER_CONTROL;
     }
     if (addr != myAddr) {
-      return Status::INVALID;
+      return Command::INVALID;
     }
   } else if ((addr & 0x60) == 0) {
     // Group address
     uint8_t group = (addr >> 1) & 0x0f;
-    uint16_t groups = mListener->getGroups();
+    uint16_t groups = mClient->getGroups();
     if (cmdBitSet) {
-      *command = (Command) *param;
-      *param = 0xff;
+      command = (Command) param;
+      param = 0xff;
     } else {
-      *command = Command::DIRECT_POWER_CONTROL;
+      command = Command::DIRECT_POWER_CONTROL;
     }
     if ((groups & (1 << group)) == 0) {
-      return Status::INVALID;
+      return Command::INVALID;
     }
   } else {
-    *command = (Command) ((uint16_t) Command::_SPECIAL_COMMAND + addr);
-    if (*command == Command::INITIALISE) {
-      uint8_t myAddr = mListener->getShortAddr() >> 1;
-      switch (*param) {
+    command = (Command) ((uint16_t) Command::_SPECIAL_COMMAND + addr);
+    if (command == Command::INITIALISE) {
+      uint8_t myAddr = mClient->getShortAddr() >> 1;
+      switch (param) {
       case 0x00: // All control gear shall react
         break;
       case 0xff: // Control gear without short address shall react
         if (myAddr <= DALI_ADDR_MAX) {
-          return Status::INVALID;
+          return Command::INVALID;
         }
         break;
       default: // Control gear with the address AAAAAAb shall react
-        if (myAddr != (*param >> 1)) {
-          return Status::INVALID;
+        if (myAddr != (param >> 1)) {
+          return Command::INVALID;
         }
         break;
       }
     }
   }
-  return Status::OK;
+  *commandParam = param;
+  return command;
 }
 
 } // namespace controller

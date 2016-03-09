@@ -24,12 +24,12 @@ const uint16_t* kUniqeChipId = (uint16_t*) 0x10000FF0; // 8 elements
 
 typedef struct {
   dali::ITimer::ITimerTask* task;
-  uint64_t time;
+  Time time;
   uint32_t period;
 } TaskInfo;
 
 TaskInfo gTasks[MAX_TASKS];
-volatile uint64_t gSystemTimeMs;
+volatile Time gSystemTimeMs;
 
 }
 
@@ -85,7 +85,7 @@ uint32_t Timer::randomize() {
 }
 
 // static
-uint64_t Timer::getTimeMs() {
+Time Timer::getTimeMs() {
   return gSystemTimeMs;
 }
 
@@ -110,7 +110,7 @@ void Timer::runSlice() {
 extern "C" {
 
 void SysTick_Handler(void) {
-  gSystemTimeMs += 1000 / TICKS_PER_SECOND;
+  gSystemTimeMs += (uint32_t)1000 / TICKS_PER_SECOND;
 }
 
 } // extern "C"

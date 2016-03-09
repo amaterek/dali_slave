@@ -20,9 +20,10 @@
 
 namespace dali {
 
-class Slave: public controller::Bus::Listener, controller::Lamp::Listener {
+class Slave: public controller::Bus::Client, controller::Lamp::Listener
+{
 public:
-  static Slave* create(IMemory* memoryDriver, ILamp* lampDriver, IBus* busDriver, ITimer* timer);
+  static Slave* create(IBusDriver* busDriver, ITimer* timer, IMemory* memoryDriver, ILamp* lampDriver);
 
   virtual ~Slave();
 
@@ -30,8 +31,8 @@ public:
   void notifyPowerDown();
 
 protected:
-  Slave(controller::Memory* memory, controller::Lamp* lamp, controller::QueryStore* queryStore,
-        controller::Bus* busDriver, controller::Initialization* initializationController);
+  Slave(IBusDriver* busDriver, ITimer* timer, controller::Memory* memory, controller::Lamp* lamp,
+      controller::QueryStore* queryStore);
 
   controller::Memory* const getMemoryController() {
     return mMemoryController;
@@ -46,10 +47,10 @@ protected:
   }
 
   Status sendAck(uint8_t ack) {
-     return mBusController->sendAck(ack);
-   }
+    return mBusController.sendAck(ack);
+  }
 
-   virtual Status handleHandleDaliDeviceTypeCommand(uint16_t repeat, Command cmd, uint8_t param, uint8_t device_type);
+  virtual Status handleHandleDaliDeviceTypeCommand(uint16_t repeat, Command cmd, uint8_t param, uint8_t device_type);
 
 private:
   Slave(const Slave& other) = delete;
@@ -66,11 +67,11 @@ private:
   Status handleIgnoredCommand(Command cmd, uint8_t param) override;
   Status internalHandleDaliDT8Command(uint16_t repeat, Command cmd, uint8_t param);
 
+  controller::Bus mBusController;
+  controller::Initialization mInitializationController;
   controller::Memory* const mMemoryController;
   controller::Lamp* const mLampController;
   controller::QueryStore* const mQueryStoreController;
-  controller::Bus* const mBusController;
-  controller::Initialization* const mInitializationController;
   bool mMemoryWriteEnabled;
   uint8_t mDeviceType;
 };
